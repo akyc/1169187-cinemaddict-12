@@ -1,7 +1,7 @@
 # Личный проект «Киноман» [![Build status][travis-image]][travis-url]
 
 * Студент: [Андрей Зюзин](https://up.htmlacademy.ru/ecmascript/12/user/1169187).
-* Наставник: `Неизвестно`.
+* Наставник: `Владимир Турецкий`.
 
 ---
 
