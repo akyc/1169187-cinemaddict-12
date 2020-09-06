@@ -6,12 +6,9 @@ export const createFilmDetailsContainer = () => {
           <div class="film-details__close">
             <button class="film-details__close-btn" type="button">close</button>
           </div>
-            <!-- createFilmDetailsInfoWrap -->
-            <!-- createFilmDetailsControls -->
         </div>
 
         <div class="form-details__bottom-container">
-          <!-- createFilmDetailsCommentsWrap -->
         </div>
       </form>
     </section>
