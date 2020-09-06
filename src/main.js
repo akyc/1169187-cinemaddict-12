@@ -19,11 +19,24 @@ import {createNoUserLevel} from "./view/no-user-level.js";
 import {createFilmDetailsContainer} from "./view/film-details-container.js";
 import {createFilmDetailsInfoWrap} from "./view/film-datails-info-wrap.js";
 import {createFilmDetailsControls} from "./view/film-details-controls.js";
-import {createFilmDetailsCommentsWrap} from "./view/film-details-comments-wrap";
+import {createFilmDetailsCommentsWrap} from "./view/film-details-comments-wrap.js";
+import {createFilmDetailsComments} from "./view/film-details-comments.js"
+import {generateFilm} from "./mock/film.js";
+import {generateNavigation} from "./mock/navigation.js";
 
-const FILMS_LIST_COUNT = 5;
+const FILMS_LIST_COUNT = 20;
+const FILMS_LIST_COUNT_PER_STEP = 5;
+
+const films = new Array(FILMS_LIST_COUNT).fill().map(generateFilm);
+const navigation = generateNavigation(films);
+
 const TOP_RATED_FILMS_COUNT = 2;
+
+const topRatedFilms = new Array(TOP_RATED_FILMS_COUNT).fill().map(generateFilm);
+
 const MOST_COMMENTED_FILMS_COUNT = 2;
+
+const mostCommentedFilms = new Array(TOP_RATED_FILMS_COUNT).fill().map(generateFilm);
 
 const siteHeader = document.querySelector(`.header`);
 const siteMain = document.querySelector(`.main`);
@@ -35,7 +48,7 @@ const render = (container, template, place) => {
 
 render(siteHeader, createHeaderProfile(), `beforeend`);
 
-render(siteMain, createMainNavigation(), `beforeend`);
+render(siteMain, createMainNavigation(navigation), `beforeend`);
 
 render(siteMain, createSort(), `beforeend`);
 
@@ -48,11 +61,28 @@ render(siteContent, createFilmsList(), `beforeend`);
 const filmsList = siteContent.querySelector(`.films-list`);
 const filmsListContainer = filmsList.querySelector(`.films-list__container`);
 
-for (let i = 0; i < FILMS_LIST_COUNT; i++) {
-  render(filmsListContainer, createFilmCard(), `beforeend`);
+for (let i = 0; i < Math.min(films.length, FILMS_LIST_COUNT_PER_STEP); i++) {
+  render(filmsListContainer, createFilmCard(films[i]), `beforeend`);
 }
+if (films.length > FILMS_LIST_COUNT_PER_STEP) {
+  let renderedFilmsCount = FILMS_LIST_COUNT_PER_STEP;
 
-render(filmsList, createShowMoreButton(), `beforeend`);
+  render(filmsList, createShowMoreButton(), `beforeend`);
+
+  const showMoreButton = filmsList.querySelector(`.films-list__show-more`);
+  showMoreButton.addEventListener(`click`, (evt) => {
+    evt.preventDefault();
+    films
+      .slice(renderedFilmsCount, renderedFilmsCount + FILMS_LIST_COUNT_PER_STEP)
+      .forEach((film) => render(filmsListContainer, createFilmCard(film), `beforeend`));
+
+    renderedFilmsCount += FILMS_LIST_COUNT_PER_STEP;
+
+    if (renderedFilmsCount >= films.length) {
+      showMoreButton.remove();
+    }
+  });
+}
 
 render(siteContent, createTopRatedFilmList(), `beforeend`);
 
@@ -62,18 +92,18 @@ const filmsListExtra = siteContent.querySelectorAll(`.films-list--extra`);
 const filmsListTopRated = filmsListExtra[0].querySelector(`.films-list__container`);
 
 for (let i = 0; i < TOP_RATED_FILMS_COUNT; i++) {
-  render(filmsListTopRated, createFilmCard(), `beforeend`);
+  render(filmsListTopRated, createFilmCard(topRatedFilms[i]), `beforeend`);
 }
 
 const filmsListMostCommented = filmsListExtra[1].querySelector(`.films-list__container`);
 
 for (let i = 0; i < MOST_COMMENTED_FILMS_COUNT; i++) {
-  render(filmsListMostCommented, createFilmCard(), `beforeend`);
+  render(filmsListMostCommented, createFilmCard(mostCommentedFilms[i]), `beforeend`);
 }
 
 const footerStatistics = siteFooter.querySelector(`.footer__statistics`);
 
-render(footerStatistics, createFooterStatistics(), `beforeend`);
+render(footerStatistics, createFooterStatistics(films.length), `beforeend`);
 
 render(siteContent, createLoadingFilmsList(), `beforeend`);
 
@@ -98,10 +128,14 @@ render(siteFooter, createFilmDetailsContainer(), `afterend`);
 const filmDetails = document.querySelector(`.film-details`);
 const detailsTopContainer = filmDetails.querySelector(`.form-details__top-container`);
 
-render(detailsTopContainer, createFilmDetailsInfoWrap(), `beforeend`);
+render(detailsTopContainer, createFilmDetailsInfoWrap(films[0]), `beforeend`);
 
-render(detailsTopContainer, createFilmDetailsControls(), `beforeend`);
+render(detailsTopContainer, createFilmDetailsControls(films[0]), `beforeend`);
 
 const detailsBottomContainer = filmDetails.querySelector(`.form-details__bottom-container`);
 
-render(detailsBottomContainer, createFilmDetailsCommentsWrap(), `beforeend`);
+render(detailsBottomContainer, createFilmDetailsCommentsWrap(films[0]), `beforeend`);
+
+const commentsList = detailsBottomContainer.querySelector(`.film-details__comments-list`);
+
+render(commentsList, createFilmDetailsComments(films[0]), `beforeend`);
